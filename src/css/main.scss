@@ -1,0 +1,25 @@
+:root{
+    --primary: #F1F564;
+    --secondary: #ED851B;
+    --tertiary: #F03712;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(43% 66%, var(--primary), var(--secondary));
+}
+
+#app{
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
