@@ -1,12 +1,13 @@
 <template>
     <canvas ref="canvas"></canvas>
-    <component :ref="prompt.name" v-for="prompt in promptObjects" :is="prompt.elem" :leftInit="prompt.left" :topInit="prompt.top" />
+    <component :ref="prompt.name" v-for="prompt in promptObjects" :is="prompt.elem" :leftInit="prompt.left" :topInit="prompt.top" :multiplier="prompt.multiplier"/>
 </template>
 
 <script>
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import Prompt from "./Prompt.vue";
+import { PROMPT_OBJECTS } from "../constants";
 import { shallowRef } from '@vue/reactivity';
 
 // Global GLTF loader
@@ -98,19 +99,27 @@ export default {
         createPrompts: function(camera) {
             for(let child of this.room.children){
                 // Get object position and create prompt
-                if(child.name === "Keyboard") { // Replace with array of objects or some shit
+                let prompt_info = PROMPT_OBJECTS.find(p => p.name === child.name);
+                if(prompt_info) { 
                     let promptVector = child.position.clone();
                     promptVector.project(camera);
                     promptVector.x = ( promptVector.x + 1) * window.innerWidth / 2;
                     promptVector.y = - ( promptVector.y - 1) * window.innerHeight / 2;
                     promptVector.z = 0;
 
+                    let multiplier = 1
+                    if(promptVector.y > 500){
+                        multiplier = (500 - promptVector.y) / 30;
+                    }
+
                     this.promptObjects.push(
                         {
                             name: child.name,
                             elem: shallowRef(Prompt),
+                            info: prompt_info,
                             top: promptVector.y - 10,
-                            left: promptVector.x - 10
+                            left: promptVector.x - 10,
+                            multiplier
                         }
                     );
                 }
@@ -119,7 +128,8 @@ export default {
         updatePrompts: function(camera) {
             for(let child of this.room.children){
                 // Get object position and update prompt
-                if(child.name === "Keyboard") { // Replace with array of objects or some shit
+                let prompt_info = PROMPT_OBJECTS.find(p => p.name === child.name);
+                if(prompt_info) { 
                     let promptVector = child.position.clone();
                     promptVector.project(camera);
                     promptVector.x = ( promptVector.x + 1) * window.innerWidth / 2;

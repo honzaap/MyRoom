@@ -32,7 +32,8 @@
 export default {
     props: {
         topInit: 0,
-        leftInit: 0
+        leftInit: 0,
+        multiplier: 0
     },
     data(){
         return {
@@ -55,21 +56,20 @@ export default {
         let mouseX = -1;
         let mouseY = -1;
 
-        window.onmousemove = (e) => {
+        window.addEventListener('mousemove', (e) => {
             e.preventDefault();
-
             // Handle mouse input to make rotating effect
             if(mouseX === -1 && mouseY === -1){
                 mouseX = e.clientX;
                 mouseY = e.clientY;
             }
-            let deltaX = e.clientX - mouseX;
-            let deltaY = e.clientY - mouseY;
+            let deltaX = (e.clientX - mouseX) * this.multiplier;
+            let deltaY = (e.clientY - mouseY) * this.multiplier;
             mouseX = e.clientX;
             mouseY = e.clientY;
 
             this.updatePosition(this.left - deltaX / 60, this.top - deltaY / 50 - deltaX / 200);
-        }
+        });
     },
     methods: {
         updatePosition(left, top) {
