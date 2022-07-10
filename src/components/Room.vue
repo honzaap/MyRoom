@@ -1,6 +1,6 @@
 <template>
     <canvas ref="canvas"></canvas>
-    <component :ref="prompt.name" v-for="prompt in promptObjects" :is="prompt.elem" :leftInit="prompt.left" :topInit="prompt.top" :multiplier="prompt.multiplier"/>
+    <component :ref="prompt.name" v-for="prompt in promptObjects" :is="prompt.elem" :infoInit="prompt.info" :leftInit="prompt.left" :topInit="prompt.top" :multiplier="prompt.multiplier"/>
 </template>
 
 <script>

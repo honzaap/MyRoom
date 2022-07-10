@@ -9,7 +9,7 @@ export const PROMPT_OBJECTS = [
         name: "Mobile",
         title: "Realme 8i",
         description: "<p>My phone with a custom case. <ul><li>4 GB RAM</li><li>32 GB storage</li><li>120 Hz display</li></ul></p>",
-        model: "mobile.glb"
+        model: "phone.glb"
     },
     {
         name: "Monitor1",

@@ -13,7 +13,7 @@
     <div ref="promptanim" class="prompt-animation-container">
         <div ref="content" class="prompt-content">
             <div class="prompt-image" ref="canvascontainer" v-show="showLine">
-                <model-viewer style="width: auto; height: 100%;" v-pre src="./assets/gltf/grass.glb" loading="lazy" auto-rotate auto-rotate-delay="0" rotation-per-second="50deg"></model-viewer>
+                <model-viewer ref="viewer" style="width: auto; height: 100%;" v-pre loading="lazy" auto-rotate auto-rotate-delay="0" rotation-per-second="50deg"></model-viewer>
             </div>
             <div class="prompt-description">
                 <h3>Placeholder</h3>
@@ -33,7 +33,8 @@ export default {
     props: {
         topInit: 0,
         leftInit: 0,
-        multiplier: 0
+        multiplier: 0,
+        infoInit: null
     },
     data(){
         return {
@@ -45,12 +46,14 @@ export default {
             contentAnimY: 0,
             hover: false,
             showLine: false,
-            showContent: false
+            showContent: false,
+            info: null
         }
     },
     created(){
         this.top = this.topInit;
         this.left = this.leftInit;
+        this.info = this.infoInit;
     },  
     mounted() {
         let mouseX = -1;
@@ -70,6 +73,8 @@ export default {
 
             this.updatePosition(this.left - deltaX / 60, this.top - deltaY / 50 - deltaX / 200);
         });
+
+        this.$refs.viewer.src = `./assets/gltf/${this.info.model}`;
     },
     methods: {
         updatePosition(left, top) {
