@@ -1,13 +1,10 @@
 <template>
-    <span @mouseenter="promptHover" @mouseleave="promptBlur" class="prompt" :style="{top: `${top}px`, left: `${left}px`}">
-        <span class="prompt-inner"></span>
-    </span>
     <svg v-show="showLine" class="linesvg" ref="linesvg">
-        <line :x2="left + 8" :y2="top + 8" stroke="#B4B4B4" stroke-width="2">
-            <animate ref="lineAnimX" fill="freeze" attributeName="x1" :to="contentAnimX" :from="left + 8" dur="0.3s" repeatCount="1" begin="0s"/>
-            <animate ref="lineAnimY" fill="freeze" attributeName="y1" :to="contentAnimY" :from="top + 8" dur="0.3s" repeatCount="1" begin="0s"/>
-            <animate ref="lineAnimBackX" fill="freeze" attributeName="x1" :from="contentAnimX" :to="left + 8" dur="0.3s" repeatCount="1" begin="0s"/>
-            <animate ref="lineAnimBackY" fill="freeze" attributeName="y1" :from="contentAnimY" :to="top + 8" dur="0.3s" repeatCount="1" begin="0s"/>
+        <line :x2="left" :y2="top" stroke="#B4B4B4" stroke-width="2">
+            <animate ref="lineAnimX" fill="freeze" attributeName="x1" :to="contentAnimX" :from="left" dur="0.3s" repeatCount="1" begin="indefinite"/>
+            <animate ref="lineAnimY" fill="freeze" attributeName="y1" :to="contentAnimY" :from="top" dur="0.3s" repeatCount="1" begin="indefinite"/>
+            <animate ref="lineAnimBackX" fill="freeze" attributeName="x1" :from="contentAnimX" :to="left" dur="0.3s" repeatCount="1" begin="indefinite"/>
+            <animate ref="lineAnimBackY" fill="freeze" attributeName="y1" :from="contentAnimY" :to="top" dur="0.3s" repeatCount="1" begin="indefinite"/>
         </line>
     </svg>
     <div ref="promptanim" class="prompt-animation-container">
@@ -33,7 +30,6 @@ export default {
     props: {
         topInit: 0,
         leftInit: 0,
-        multiplier: 0,
         infoInit: null
     },
     data(){
@@ -56,46 +52,29 @@ export default {
         this.info = this.infoInit;
     },  
     mounted() {
-        let mouseX = -1;
-        let mouseY = -1;
-
-        window.addEventListener('mousemove', (e) => {
-            e.preventDefault();
-            // Handle mouse input to make rotating effect
-            if(mouseX === -1 && mouseY === -1){
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            }
-            let deltaX = (e.clientX - mouseX) * this.multiplier;
-            let deltaY = (e.clientY - mouseY) * this.multiplier;
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            this.updatePosition(this.left - deltaX / 60, this.top - deltaY / 50 - deltaX / 200);
-        });
-
-        this.$refs.viewer.src = `./assets/gltf/${this.info.model}`;
+        this.updatePosition(this.topInit, this.leftInit);
+        this.promptHover();
     },
     methods: {
-        updatePosition(left, top) {
-            this.left = left;
+        updatePosition(top, left){
             this.top = top;
+            this.left = left;
         },
-        promptHover(){
-            // Todo: keep within window bounds
+        promptHover() {
+            //this.$refs.viewer.src = `./assets/gltf/${this.info.model}`;
             this.hover = true;
             this.showLine = true;
-            this.$refs.linesvg.style.opacity = 1;
+            if(this.$refs.linesvg) this.$refs.linesvg.style.opacity = 1;
 
             // Position prompt popup
-            let contentY = Math.max(this.top - this.$refs.content.clientHeight - this.contentShiftY, 0);
-            let contentX = Math.max(this.left - this.$refs.content.clientWidth - this.contentShiftX, 0);
+            let contentY = Math.max(this.top - 100 - this.contentShiftY, 0);
+            let contentX = Math.max(this.left - 300 - this.contentShiftX, 0);
 
-            this.contentAnimX = contentX + this.$refs.content.clientWidth;
-            this.contentAnimY = contentY + this.$refs.content.clientHeight;
+            this.contentAnimX = contentX + 300;
+            this.contentAnimY = contentY + 100;
 
-            this.$refs.promptanim.style.top =  `${contentY + this.$refs.content.clientHeight}px`;
-            this.$refs.promptanim.style.left = `${contentX + this.$refs.content.clientWidth}px`;
+            this.$refs.promptanim.style.top =  `${contentY + 100}px`;
+            this.$refs.promptanim.style.left = `${contentX + 300}px`;
 
             this.$refs.promptanim.style.width = 0;
             this.$refs.promptanim.style.height = 0;
@@ -106,8 +85,8 @@ export default {
 
             setTimeout(() => {
                 if(!this.hover) return;
-                this.$refs.promptanim.style.height = `${this.$refs.content.clientHeight}px`;
-                this.$refs.promptanim.style.width = `${this.$refs.content.clientWidth}px`;
+                this.$refs.promptanim.style.height = `${100}px`;
+                this.$refs.promptanim.style.width = `${300}px`;
 
                 this.$refs.promptanim.style.top =  `${contentY}px`;
                 this.$refs.promptanim.style.left = `${contentX}px`;
@@ -122,14 +101,14 @@ export default {
             }
 
             // Position prompt popup
-            let contentY = Math.max(this.top - this.$refs.content.clientHeight - this.contentShiftY, 0);
-            let contentX = Math.max(this.left - this.$refs.content.clientWidth - this.contentShiftX, 0);
+            let contentY = Math.max(this.top - 100 - this.contentShiftY, 0);
+            let contentX = Math.max(this.left - 300 - this.contentShiftX, 0);
 
-            this.contentAnimX = contentX + this.$refs.content.clientWidth;
-            this.contentAnimY = contentY + this.$refs.content.clientHeight;
+            this.contentAnimX = contentX + 300;
+            this.contentAnimY = contentY + 100;
 
-            this.$refs.promptanim.style.top =  `${contentY + this.$refs.content.clientHeight}px`;
-            this.$refs.promptanim.style.left = `${contentX + this.$refs.content.clientWidth}px`;
+            this.$refs.promptanim.style.top =  `${contentY + 100}px`;
+            this.$refs.promptanim.style.left = `${contentX + 300}px`;
 
             this.$refs.promptanim.style.width = 0;
             this.$refs.promptanim.style.height = 0;
@@ -150,7 +129,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .prompt{
     display: flex;
     position: absolute;
@@ -159,6 +138,7 @@ export default {
     z-index: 1;
     justify-content: center;
     align-items: center;
+    pointer-events: all;
     cursor: pointer;
     &::after{
         position: absolute;

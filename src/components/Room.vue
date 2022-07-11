@@ -1,11 +1,14 @@
 <template>
-    <canvas ref="canvas"></canvas>
-    <component :ref="prompt.name" v-for="prompt in promptObjects" :is="prompt.elem" :infoInit="prompt.info" :leftInit="prompt.left" :topInit="prompt.top" :multiplier="prompt.multiplier"/>
+    <div id="container">
+        <canvas ref="canvas"></canvas>
+    </div>
+    <Prompt v-if="currentPrompt != null" ref="prompt" :infoInit="currentPrompt.info" :leftInit="currentPrompt.left" :topInit="currentPrompt.top"/>
 </template>
 
 <script>
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { CSS2DRenderer, CSS2DObject } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import Prompt from "./Prompt.vue";
 import { PROMPT_OBJECTS } from "../constants";
 import { shallowRef } from '@vue/reactivity';
@@ -17,6 +20,7 @@ export default {
     data(){
         return {
             promptObjects: [],
+            currentPrompt: null
         }
     },
     components: {
@@ -30,21 +34,27 @@ export default {
 
         this.loadRoom(scene, camera);
 
+        let labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize( window.innerWidth, window.innerHeight );
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0px';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
+
         // Animation loop
         const animate = () => {
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
+            labelRenderer.render( scene, camera );
         }
         animate();
 
         // Resize renderer when window size changes 
         window.onresize = () => {
             // Update renderer
-            this.resizeRenderer(renderer);
+            this.resizeRenderer(renderer, labelRenderer);
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
-
-            this.updatePrompts(camera);
         }
           
         function rotateScene(deltaX, deltaY) {
@@ -68,6 +78,7 @@ export default {
             let deltaY = e.clientY - mouseY;
             mouseX = e.clientX;
             mouseY = e.clientY;
+
             rotateScene(deltaX, deltaY);
         });
 
@@ -85,58 +96,59 @@ export default {
             mouseY = e.touches[0].clientY;
             rotateScene(deltaX, deltaY);
         });
+
     },
     methods: {
         loadRoom: function(scene, camera) {
             loader.load("./assets/gltf/room.glb", (gltf) => {
                 this.room = gltf.scene;
-                this.createPrompts(camera);
+                this.createPrompts(camera, scene);
                 scene.add(gltf.scene);
             }, undefined, function (error) {
                 console.error(error);
             } );
         },
-        createPrompts: function(camera) {
+        createPrompts: function(camera, scene) {
             for(let child of this.room.children){
                 // Get object position and create prompt
                 let prompt_info = PROMPT_OBJECTS.find(p => p.name === child.name);
                 if(prompt_info) { 
-                    let promptVector = child.position.clone();
-                    promptVector.project(camera);
-                    promptVector.x = ( promptVector.x + 1) * window.innerWidth / 2;
-                    promptVector.y = - ( promptVector.y - 1) * window.innerHeight / 2;
-                    promptVector.z = 0;
+                    const prompt = document.createElement('div');
+                    const promptInner = document.createElement('div');
+                    prompt.className = 'prompt';
+                    promptInner.className = 'prompt-inner';
+                    prompt.appendChild(promptInner);
 
-                    let multiplier = 1
-                    if(promptVector.y > 500){
-                        multiplier = (500 - promptVector.y) / 30;
-                    }
+                    const label = new CSS2DObject(prompt);
+                    const hover = () => {
+                        let coords = label.element.style.transform.slice(32, -1).split(",").map(c => parseFloat(c.slice(0, -2)));
+                        this.currentPrompt = {
+                            info: prompt_info, 
+                            left: coords[0],
+                            top: coords[1]
+                        };
 
-                    this.promptObjects.push(
-                        {
-                            name: child.name,
-                            elem: shallowRef(Prompt),
-                            info: prompt_info,
-                            top: promptVector.y - 10,
-                            left: promptVector.x - 10,
-                            multiplier
+                        if(this.$refs.prompt) {
+                            this.$refs.prompt.updatePosition(coords[1], coords[0]);
+                            this.$refs.prompt.promptHover();
                         }
-                    );
-                }
-            }
-        },
-        updatePrompts: function(camera) {
-            for(let child of this.room.children){
-                // Get object position and update prompt
-                let prompt_info = PROMPT_OBJECTS.find(p => p.name === child.name);
-                if(prompt_info) { 
-                    let promptVector = child.position.clone();
-                    promptVector.project(camera);
-                    promptVector.x = ( promptVector.x + 1) * window.innerWidth / 2;
-                    promptVector.y = - ( promptVector.y - 1) * window.innerHeight / 2;
-                    promptVector.z = 0;
-
-                    this.$refs[child.name][0].updatePosition(promptVector.x - 10, promptVector.y - 10);
+                    }
+                    const leave = () => {
+                        if(this.currentPrompt == null) return;
+                        this.$refs.prompt.promptBlur();
+                        this.currentPrompt.delete = true;
+                        setTimeout(() => {
+                            if(!this.currentPrompt.delete) return;
+                            this.currentPrompt = null;
+                        }, 750);
+                    }
+                    label.element.onmouseover = hover;
+                    label.element.onmouseleave = leave;
+                    label.element.ontouchstart = hover;
+                    label.element.ontouchend = leave;
+                    
+                    label.position.copy(child.position);
+                    scene.add(label);
                 }
             }
         },
@@ -159,7 +171,8 @@ export default {
 
             renderer.setClearColor( 0x000000, 0 );
 
-            this.resizeRenderer(renderer);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(window.innerWidth, window.innerHeight);
 
             renderer.render(scene, camera);
             renderer.outputEncoding = THREE.sRGBEncoding;
@@ -168,9 +181,10 @@ export default {
 
             return renderer;
         },
-        resizeRenderer: function (renderer) { // Set's the renderers size to current window size
+        resizeRenderer: function (renderer, labelRenderer) { // Set's the renderers size to current window size
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
         }
     }
 }
