@@ -129,7 +129,7 @@ export default {
                         };
 
                         if(this.$refs.prompt) {
-                            this.$refs.prompt.updatePosition(coords[1], coords[0]);
+                            this.$refs.prompt.updateParams(coords[1], coords[0], prompt_info);
                             this.$refs.prompt.promptHover();
                         }
                     }

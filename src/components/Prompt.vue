@@ -13,13 +13,8 @@
                 <model-viewer ref="viewer" style="width: auto; height: 100%;" v-pre loading="lazy" auto-rotate auto-rotate-delay="0" rotation-per-second="50deg"></model-viewer>
             </div>
             <div class="prompt-description">
-                <h3>Placeholder</h3>
-                <p>Insane placeholder</p>
-                <ul>
-                    <li>Turbo GIGA</li>
-                    <li>Mega super</li>
-                    <li>Extra big</li>
-                </ul>
+                <h3>{{ info.title }}</h3>
+                <div v-html="info.description"></div>
             </div>
         </div>
     </div>
@@ -52,16 +47,17 @@ export default {
         this.info = this.infoInit;
     },  
     mounted() {
-        this.updatePosition(this.topInit, this.leftInit);
+        this.updateParams(this.topInit, this.leftInit, this.infoInit);
         this.promptHover();
     },
     methods: {
-        updatePosition(top, left){
+        updateParams(top, left, info){
             this.top = top;
             this.left = left;
+            this.info = info;
         },
         promptHover() {
-            //this.$refs.viewer.src = `./assets/gltf/${this.info.model}`;
+            this.$refs.viewer.src = `./assets/gltf/${this.info.model}`;
             this.hover = true;
             this.showLine = true;
             if(this.$refs.linesvg) this.$refs.linesvg.style.opacity = 1;
@@ -85,7 +81,7 @@ export default {
 
             setTimeout(() => {
                 if(!this.hover) return;
-                this.$refs.promptanim.style.height = `${100}px`;
+                this.$refs.promptanim.style.height = `${this.$refs.content.clientHeight}px`;
                 this.$refs.promptanim.style.width = `${300}px`;
 
                 this.$refs.promptanim.style.top =  `${contentY}px`;
@@ -193,20 +189,22 @@ svg{
     background: linear-gradient(102.98deg, var(--primary) 8%, var(--secondary) 23%, var(--tertiary) 68%);
     z-index: 3;
     font-size: 0.875rem;
+    min-height: 100px;
     .prompt-image{
-        width: 80px;
+        min-width: 80px;
+        max-width: 80px;
     }
     .prompt-description{
         padding: 6px 10px;
         flex-grow: 1;
         h3{
-            font-size: 1.25em;
+            font-size: 1.15em;
         }
         p{
             margin: 0;
         }
         ul{
-            padding-left: 18px;
+            padding-left: 12px;
         }
     }
 }

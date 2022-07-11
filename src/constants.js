@@ -32,7 +32,7 @@ export const PROMPT_OBJECTS = [
     {
         name: "Macbook",
         title: "MacBook Air M1",
-        description: "<p>MacBook I use for job and school, or when I'm not home.<ul><li>M1 CPU | 13.3\"</li><li>511 GB SSD | 8 GB RAM</li></ul></p>",
+        description: "<p>MacBook I use for job and school, or when I'm not home.<ul><li>M1 CPU | 13.3\"</li><li>256 GB SSD | 8 GB RAM</li></ul></p>",
         model: "macbook.glb"
     },
     {
