@@ -144,8 +144,8 @@ export default {
                     }
                     label.element.onmouseover = hover;
                     label.element.onmouseleave = leave;
-                    label.element.ontouchstart = hover;
-                    label.element.ontouchend = leave;
+                    label.element.onfocus = hover;
+                    label.element.onblur = leave;
                     
                     label.position.copy(child.position);
                     scene.add(label);

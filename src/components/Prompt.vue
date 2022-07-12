@@ -63,14 +63,14 @@ export default {
             if(this.$refs.linesvg) this.$refs.linesvg.style.opacity = 1;
 
             // Position prompt popup
-            let contentY = Math.max(this.top - 100 - this.contentShiftY, 0);
-            let contentX = Math.max(this.left - 300 - this.contentShiftX, 0);
+            let contentY = Math.max(this.top - 125 - this.contentShiftY, 0);
+            let contentX = Math.max(this.left - 350 - this.contentShiftX, 0);
 
-            this.contentAnimX = contentX + 300;
-            this.contentAnimY = contentY + 100;
+            this.contentAnimX = contentX + 350;
+            this.contentAnimY = contentY + 125;
 
-            this.$refs.promptanim.style.top =  `${contentY + 100}px`;
-            this.$refs.promptanim.style.left = `${contentX + 300}px`;
+            this.$refs.promptanim.style.top =  `${contentY + 125}px`;
+            this.$refs.promptanim.style.left = `${contentX + 350}px`;
 
             this.$refs.promptanim.style.width = 0;
             this.$refs.promptanim.style.height = 0;
@@ -81,8 +81,8 @@ export default {
 
             setTimeout(() => {
                 if(!this.hover) return;
-                this.$refs.promptanim.style.height = `${this.$refs.content.clientHeight}px`;
-                this.$refs.promptanim.style.width = `${300}px`;
+                this.$refs.promptanim.style.height = `125px`;
+                this.$refs.promptanim.style.width = `350px`;
 
                 this.$refs.promptanim.style.top =  `${contentY}px`;
                 this.$refs.promptanim.style.left = `${contentX}px`;
@@ -97,14 +97,14 @@ export default {
             }
 
             // Position prompt popup
-            let contentY = Math.max(this.top - 100 - this.contentShiftY, 0);
-            let contentX = Math.max(this.left - 300 - this.contentShiftX, 0);
+            let contentY = Math.max(this.top - 125 - this.contentShiftY, 0);
+            let contentX = Math.max(this.left - 350 - this.contentShiftX, 0);
 
-            this.contentAnimX = contentX + 300;
-            this.contentAnimY = contentY + 100;
+            this.contentAnimX = contentX + 350;
+            this.contentAnimY = contentY + 125;
 
-            this.$refs.promptanim.style.top =  `${contentY + 100}px`;
-            this.$refs.promptanim.style.left = `${contentX + 300}px`;
+            this.$refs.promptanim.style.top =  `${contentY + 125}px`;
+            this.$refs.promptanim.style.left = `${contentX + 350}px`;
 
             this.$refs.promptanim.style.width = 0;
             this.$refs.promptanim.style.height = 0;
@@ -185,14 +185,14 @@ svg{
     display: flex;
     align-items: stretch;
     color: #fff;
-    width: 300px;
+    min-width: 350px;
+    min-height: 125px;
     background: linear-gradient(102.98deg, var(--primary) 8%, var(--secondary) 23%, var(--tertiary) 68%);
     z-index: 3;
     font-size: 0.875rem;
-    min-height: 100px;
     .prompt-image{
-        min-width: 80px;
-        max-width: 80px;
+        min-width: 100px;
+        max-width: 100px;
     }
     .prompt-description{
         padding: 6px 10px;
