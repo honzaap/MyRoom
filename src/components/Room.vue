@@ -1,6 +1,9 @@
 <template>
     <div id="container">
         <canvas ref="canvas"></canvas>
+        <div ref="loading" class="loading">
+            <p>Loading</p>
+        </div>
     </div>
     <Prompt v-if="currentPrompt != null" ref="prompt" :infoInit="currentPrompt.info" :leftInit="currentPrompt.left" :topInit="currentPrompt.top"/>
 </template>
@@ -27,6 +30,7 @@ export default {
         Prompt
     },
     mounted(){
+        this.$refs.loading.style.display = "flex";
         // Create scene
         const scene = new THREE.Scene();
         const camera = this.createCamera();
@@ -109,6 +113,7 @@ export default {
             } );
         },
         createPrompts: function(camera, scene) {
+
             for(let child of this.room.children){
                 // Get object position and create prompt
                 let prompt_info = PROMPT_OBJECTS.find(p => p.name === child.name);
@@ -151,6 +156,8 @@ export default {
                     scene.add(label);
                 }
             }
+
+            this.$refs.loading.style.display = "none";
         },
         createCamera: function () { // Create and cofigure camera and return it 
             const camera = new THREE.PerspectiveCamera(47, window.innerWidth / window.innerHeight, 1, 15);
@@ -190,9 +197,47 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 canvas{
     width: 100vw;
     height: 100vh;
+}
+.loading{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    color: #fff;
+    background: var(--secondary);
+    p{
+        display: flex;
+        &::after{
+            content: "";
+            max-width: 0;
+            display: block;
+            animation: loading 1500ms linear infinite;
+        }
+    }
+ 
+}
+
+@keyframes loading {
+    0%{
+        content: "";
+    }
+    25%{
+        content: ".";
+    }
+    50%{
+        content: "..";
+    }
+    75%{
+        content: "..."
+    }
 }
 </style>
